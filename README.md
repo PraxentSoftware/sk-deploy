@@ -4,6 +4,15 @@ Ansible. Although these scripts can be run stand alone, it is assumed, that
 they are located and executed within a StarterKit repository.
 
 ## Usage
+When the deploy playbook is called, you must pass in:
+
+- the type of deployment (init = first time, migrate = updating and existing site)
+
+- the host
+
+- the target folder
+
+- the backup folder
 
 ```ansible-playbook path/to/deploy/deploy.yml --tags="{init|migrate}" --connection="{HOST}" --extra-vars="target_folder={path}, backup_folder={path}"```
 
@@ -25,6 +34,8 @@ they are located and executed within a StarterKit repository.
 
   - Run finalize
 
+  - Run project install scripts
+
 
 - **upload**
 
@@ -39,23 +50,23 @@ they are located and executed within a StarterKit repository.
 
 - **restore**
 
-  - Dump DB
+  - Drop DB
 
   - Load DB from {BACKUP_FOLDER}
 
 - **deploy**
 
-  - Run backup
-
   - Run upload
 
+  - Put site offline
+
+  - Run backup
+
   - Symlink {TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
-      to {TARGET_FOLDEr}/shared/settings.php
+      to {TARGET_FOLDER}/shared/settings.php
 
   - Symlink {TARGET_FOLDER}/builds/candidate/htdocs/sites/default/files
-      to {TARGET_FOLDEr}/shared/files
-
-  - Put site offline
+      to {TARGET_FOLDER}/shared/files
 
   - Symlink {TARGET_FOLDER}/htdocs to {TARGET_FOLDER}/builds/candidate
 
@@ -75,7 +86,7 @@ they are located and executed within a StarterKit repository.
 
 - **rollback**
 
-  - rm htdocs; symlink htdocs to {TARGET_FOLDER}/builds/current
+  - symlink htdocs to {TARGET_FOLDER}/builds/current (ln -sfn)
 
   - Drop DB
 
