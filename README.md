@@ -83,6 +83,8 @@ When the deploy playbook is called, you must pass in:
   - IF exists {TARGET_FOLDER}/builds/current -> mv /current /previous
 
   - mv {TARGET_FOLDER}/builds/candidate /current
+  
+  - update symlink from candidate to current (ln -sfn current/ htdocs/)
 
 - **rollback**
 
