@@ -19,6 +19,10 @@
   tags:
     - rollback
 
+- name: Restore backup DB
+  action: command drush --root=${TARGET_FOLDER}/htdocs sqlc < ${BACKUP_FOLDER}/current.sql
+  tags:
+    - rollback
 
 - name: Remove candidate build
   action: command rm -rf ${TARGET_FOLDER}/builds/candidate

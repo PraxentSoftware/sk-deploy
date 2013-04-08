@@ -35,3 +35,8 @@
   tags:
    - init
    - finalize
+
+- name: Bring site online
+  action: command drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
+  tags:
+    - finalize

@@ -69,3 +69,32 @@
   tags:
     - init
     - migrate
+
+- name: Install profile
+  action: command drush --root=${TARGET_FOLDER}/htdocs si ${PROJECT_NAME} --db-url="mysql://${DB_USER}:${DB_PASS}@localhost/${DB_NAME}"
+  tags:
+    - init
+
+- name: Update admin password
+  action: command drush --root=${TARGET_FOLDER}/htdocs upwd admin --password="${ADMIN_PASS}"
+  tags:
+    - init
+
+- name: Put site in offline mode
+  action: command drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 1
+  tags:
+    - migrate
+
+- name: Backup current site
+  action: command drush --root=${TARGET_FOLDER}/htdocs sql-dump --result-file=${BACKUP_FOLDER}/current.sql
+  tags:
+    - migrate
+
+- name: Update htdocs symlink to current build
+  action: command ln -sfn ${TARGET_FOLDER}/builds/candidate/htdocs ${TARGET_FOLDER}/htdocs
+  tags:
+   - migrate
+
+# TODO Put files in shared
+# TODO Put settings.php in shared
+# TODO symlink to files and settings
