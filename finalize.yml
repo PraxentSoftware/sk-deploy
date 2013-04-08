@@ -1,0 +1,26 @@
+##
+# Ansible playbook for starterkit deployment.
+# Requires the following parameters called upon playbook execution:
+# HOSTNAME: the name of the host
+# TARGET_FOLDER: /path/to/target/project/folder on the remote
+##
+
+---
+- hosts: ${HOSTNAME}
+  connection: local
+
+  tasks:
+    - name: Remove old build
+      action: command rm -rf ${TARGET_FOLDER}/builds/old
+
+    - name: Move previous build to old build
+      action: command mv ${TARGET_FOLDER}/builds/previous ${TARGET_FOLDER}/builds/old
+
+    - name: Move current build to previous build
+      action: command mv ${TARGET_FOLDER}/builds/current ${TARGET_FOLDER}/builds/previous
+
+    - name: Move candidate build to current build
+      action: command mv ${TARGET_FOLDER}/builds/candidate  ${TARGET_FOLDER}/builds/current
+
+    - name: Update htdocs symlink to current build
+      action: command ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs

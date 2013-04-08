@@ -1,0 +1,24 @@
+##
+# Ansible playbook for starterkit deployment.
+# Requires the following parameters called upon playbook execution:
+# HOSTNAME: the name of the host
+# TARGET_FOLDER: /path/to/target/project/folder on the remote
+# DB_NAME: The target production database name
+# DB_USER: The target production database mysql user
+# DB_PASSWORD: The target production database mysql password
+##
+
+---
+- hosts: ${HOSTNAME}
+  connection: local
+
+  - tasks:
+    name: Replace candidate build htdocs symlink with current symlink
+    action: command ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs
+
+    name: Drop current database
+    action: action: command mysql --user=${DB_USER} --password=${DB_PASSWORD} -h localhost -e "DROP DATABASE IF EXISTS ${DB_NAME};"
+
+    name: Remove candidate build
+    action: command rm -rf ${TARGET_FOLDER}/builds/candidate
+
