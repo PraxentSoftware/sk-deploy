@@ -25,6 +25,21 @@
   tags:
     - init
 
+- name: Create current folder
+  file: path=${TARGET_FOLDER}/builds/current state=directory
+  tags:
+    - init
+
+- name: Create previous folder
+  file: path=${TARGET_FOLDER}/builds/previous state=directory
+  tags:
+    - init
+
+- name: Create old folder
+  file: path=${TARGET_FOLDER}/builds/old state=directory
+  tags:
+    - init
+
 - name: Create shared folder
   file: path=${TARGET_FOLDER}/shared state=directory
   tags:
