@@ -5,55 +5,52 @@
 # TARGET_FOLDER: /path/to/target/project/folder on the remote
 # BACKUP_FOLDER: /path/to/target/backup/folder on the remote
 # PROJECT_NAME: name of the current project
-# JENKINS_WORKSPACE: /path/to/jenkins/workspace locally 
+# JENKINS_WORKSPACE: /path/to/jenkins/workspace locally
 #
 ##
 
 ---
-- hosts: ${HOSTNAME}
+- name: Create target folder
+  file: path=${TARGET_FOLDER} state=directory
+  tags:
+    - init
+
+- name: Create builds folder
+  file: path=${TARGET_FOLDER}/builds state=directory
+  tags:
+    - init
+
+- name: Create candidate folder
+  file: path=${TARGET_FOLDER}/builds/candidate state=directory
+  tags:
+    - init
+
+- name: Create shared folder
+  file: path=${TARGET_FOLDER}/shared state=directory
+  tags:
+    - init
+
+- name: Archive project
   connection: local
-  
-  tasks:
-    - name: Create target folder
-      action: command mkdir ${TARGET_FOLDER}
-      tags:
-        - init
+  shell: cd ${JENKINS_WORKSPACE}; tar czvf candidate.tar.gz .
+  tags:
+    - init
+    - migrate
 
-    - name: Create builds folder
-      action: command mkdir ${TARGET_FOLDER}/builds
-      tags:
-        - init
+- name: Upload tarball to remote
+  action: copy src=${JENKINS_WORKSPACE}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate/candidate.tar.gz
+  tags:
+    - init
+    - migrate
 
-    - name: Create shared folder
-      action: command mkdir ${TARGET_FOLDER}/shared
-      tags:
-        - init
+- name: Unpack project tarball to candidate
+  action: command tar zxfv ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
+  tags:
+    - init
+    - migrate
 
-    - name: Create backup folder
-      action: command mkdir ${BACKUP_FOLDER}
-      tags:
-        - init
-
-    - name: Upload tarball to remote
-      action: copy src=${JENKINS_WORKSPACE}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate.tar.gz
-      tags:
-        - init
-        - migrate
-
-    - name: Unpack project tarball to candidate
-      action: command tar -zxfv ${TARGET_FOLDER}/builds/candidate.tar.gz
-      tags:
-        - init
-        - migrate
-
-    - name: Rename candidate build folder
-      action: command mv ${TARGET_FOLDER}/builds/${PROJECT_NAME} ${TARGET_FOLDER}/builds/candidate
-      tags:
-        - init
-        - migrate
-
-    - name: Remove candidate build tarball
-      action: rm -f ${TARGET_FOLDER}/builds/candidata.tar.gz
-      tags:
-        - init
-        - migrate
+- name: Remove candidate build tarball
+  action: command rm -f ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz
+  tags:
+    - init
+    - migrate

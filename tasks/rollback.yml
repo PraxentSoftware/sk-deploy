@@ -9,16 +9,19 @@
 ##
 
 ---
-- hosts: ${HOSTNAME}
-  connection: local
+- name: Replace candidate build htdocs symlink with current symlink
+  action: command ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs
+  tags:
+    - rollback
 
-  - tasks:
-    name: Replace candidate build htdocs symlink with current symlink
-    action: command ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs
+- name: Drop current database
+  action: command mysql --user=${DB_USER} --password=${DB_PASSWORD} -h localhost -e "DROP DATABASE IF EXISTS ${DB_NAME};"
+  tags:
+    - rollback
 
-    name: Drop current database
-    action: action: command mysql --user=${DB_USER} --password=${DB_PASSWORD} -h localhost -e "DROP DATABASE IF EXISTS ${DB_NAME};"
 
-    name: Remove candidate build
-    action: command rm -rf ${TARGET_FOLDER}/builds/candidate
+- name: Remove candidate build
+  action: command rm -rf ${TARGET_FOLDER}/builds/candidate
+  tags:
+    - rollback
 

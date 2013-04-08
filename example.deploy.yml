@@ -1,0 +1,23 @@
+##
+# Ansible playbook for starterkit deployment.
+# Requires the following parameters called upon playbook execution:
+# HOSTNAME: the name of the host
+# TARGET_FOLDER: /path/to/target/project/folder on the remote
+# BACKUP_FOLDER: /path/to/target/backup/folder on the remote
+# PROJECT_NAME: name of the current project
+# JENKINS_WORKSPACE: /path/to/jenkins/workspace locally
+#
+##
+
+---
+- hosts: ${HOSTNAME}
+
+- vars:
+    base: /path/to/tasks
+
+
+- tasks:
+    - include: $base/deploy.yml
+    - include: $base/finalize.yml
+    - include: $base/rollback.yml
+
