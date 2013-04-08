@@ -35,7 +35,7 @@
         - init
 
     - name: Upload tarball to remote
-      action: copy src=${WORKSPACE}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate.tar.gz
+      action: copy src=${JENKINS_WORKSPACE}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate.tar.gz
       tags:
         - init
         - migrate
