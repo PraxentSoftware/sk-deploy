@@ -15,6 +15,12 @@
   tags:
     - init
 
+- name: Set permissions
+  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}
+  sudo: yes
+  tags:
+    - init
+
 - name: Create builds folder
   file: path=${TARGET_FOLDER}/builds state=directory
   tags:
@@ -59,7 +65,7 @@
     - migrate
 
 - name: Unpack project tarball to candidate
-  action: command tar zxfv ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
+  shell: tar zxf ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
   tags:
     - init
     - migrate
@@ -70,13 +76,29 @@
     - init
     - migrate
 
+- name: Set htdocs symlink to candidate
+  action: command ln -sfn ${TARGET_FOLDER}/builds/candidate/htdocs ${TARGET_FOLDER}/htdocs
+  tags:
+   - init
+   - migrate
+
 - name: Install profile
-  action: command drush --root=${TARGET_FOLDER}/htdocs si ${PROJECT_NAME} --db-url="mysql://${DB_USER}:${DB_PASS}@localhost/${DB_NAME}"
+  action: command drush --root=${TARGET_FOLDER}/htdocs si ${PROJECT_NAME} --db-su=${DB_SU} --db-su-pw=${DB_SU_PW} --db-url="mysql://${DB_USER}:${DB_PW}@localhost/${DB_NAME}" -y
   tags:
     - init
 
 - name: Update admin password
   action: command drush --root=${TARGET_FOLDER}/htdocs upwd admin --password="${ADMIN_PASS}"
+  tags:
+    - init
+
+- name: Move drupal files folder to shared folder
+  action: command mv ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/files ${TARGET_FOLDER}/shared/files
+  tags:
+    - init
+
+- name: Move drupal settings.php file to shared folder
+  action: command mv ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php ${TARGET_FOLDER}/shared/settings.php
   tags:
     - init
 
@@ -90,11 +112,15 @@
   tags:
     - migrate
 
-- name: Update htdocs symlink to current build
-  action: command ln -sfn ${TARGET_FOLDER}/builds/candidate/htdocs ${TARGET_FOLDER}/htdocs
+- name: Symlink drupal files folder to shared files folder
+  action: command ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/files
   tags:
-   - migrate
+    - init
+    - migrate
 
-# TODO Put files in shared
-# TODO Put settings.php in shared
-# TODO symlink to files and settings
+- name: Symlink drupal settings.php to shared settings.php file
+  action: command ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
+  tags:
+    - init
+    - migrate
+

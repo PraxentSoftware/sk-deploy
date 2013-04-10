@@ -36,6 +36,19 @@
    - init
    - finalize
 
+- name: Symlink drupal files folder to shared files folder
+  action: command ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/current/htdocs/sites/default/files
+  tags:
+    - init
+    - finalize
+
+- name: Symlink drupal settings.php to shared settings.php file
+  action: command ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/current/htdocs/sites/default/settings.php
+  tags:
+    - init
+    - finalize
+
+
 - name: Bring site online
   action: command drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
   tags:

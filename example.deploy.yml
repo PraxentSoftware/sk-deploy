@@ -11,6 +11,7 @@
 
 ---
 - hosts: ${HOSTNAME}
+  sudo: yes
 
 - vars:
     base: /path/to/tasks
