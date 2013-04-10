@@ -6,15 +6,35 @@ they are located and executed within a StarterKit repository.
 ## Usage
 When the deploy playbook is called, you must pass in:
 
-- the type of deployment (init = first time, migrate = updating and existing site)
+- the type of deployment (init = first time, migrate = updating and existing site, finalize = setting the candidate to the current build, rollback = restoring the previous build)
 
 - the host
+
+- the ssh user
+
+- the group name used by the webserver
+
+- the name of the install profile (project name)
+
+- the root database user
+
+- the root database password
+
+- the project database user
+
+- the project database password
+
+- the database name
+
+- the Drupal root user password
 
 - the target folder
 
 - the backup folder
 
-```ansible-playbook path/to/deploy/deploy.yml --tags="{init|migrate}" --connection="{HOST}" --extra-vars="target_folder={path}, backup_folder={path}"```
+- the local project folder
+
+```ansible-playbook path/to/deploy/deploy.yml --tags="{init|migrate|finalize|rollback}"  --extra-vars="HOSTNAME={string} USER={string} GROUP={string} PROJECT_NAME={string} DB_SU={string} DB_SU_PW={string} DB_USER={string} DB_PW={string} DB_NAME={string} DRUPAL_SU_PW={string} TARGET_FOLDER={path} BACKUP_FOLDER={path} LOCAL_PROJECT_FOLDER={path}"```
 
 ## Tasks
 
@@ -24,43 +44,41 @@ When the deploy playbook is called, you must pass in:
 
   - Create builds folder {TARGET_FOLDER}/builds
 
+  - Create candidate folder {TARGET_FOLDER}/builds/candidate
+
+  - Create current folder {TARGET_FOLDER}/builds/current
+
+  - Create previous folder {TARGET_FOLDER}/builds/previous
+
+  - Create old folder {TARGET_FOLDER}/builds/old
+
   - Create shared folder {TARGET_FOLDER}/shared
 
-  - Create {BACKUP_FOLDER}
+  - Set permissions (user and webserver group)
 
-  - Create vhost
+  - Archive project / Upload / Unpack in candidate folder
 
-  - Run upload
+  - Symlink htdocs to candidate
 
-  - Run finalize
+  - Install profile
 
-  - Run project install scripts
+  - Update admin password
 
+  - Move files and settings.php into shared folder and symlink files
+    and settings.php to shared
 
-- **upload**
-
-  - Tarball current project
-
-  - Upload archive and unpack to {TARGET_FOLDER}/builds/candidate
+  - Run finalize tasks
 
 
-- **backup**
+- **migrate**
 
-  - Dump DB to {BACKUP_FOLDER}
+  - Archive project / Upload / Unpack in candidate folder
 
-- **restore**
-
-  - Drop DB
-
-  - Load DB from {BACKUP_FOLDER}
-
-- **deploy**
-
-  - Run upload
+  - Symlink htdocs to candidate
 
   - Put site offline
 
-  - Run backup
+  - Backup site
 
   - Symlink {TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
       to {TARGET_FOLDER}/shared/settings.php
@@ -74,24 +92,30 @@ When the deploy playbook is called, you must pass in:
 
   - Bring site online
 
+
 - **finalize**
 
-  - IF exists {TARGET_FOLDER}/builds/old -> rm -r /old
+  - IF exists {TARGET_FOLDER}/builds/old -> rm -rf /old
 
   - IF exists {TARGET_FOLDER}/builds/previous -> mv /previous /old
 
   - IF exists {TARGET_FOLDER}/builds/current -> mv /current /previous
 
   - mv {TARGET_FOLDER}/builds/candidate /current
-  
-  - update symlink from candidate to current (ln -sfn current/ htdocs/)
+
+  - Update symlink from candidate to current (ln -sfn current/ htdocs/)
+
+  - Symlink the current build's files and settings to shared
+
+  - Bring site online
+
 
 - **rollback**
 
-  - symlink htdocs to {TARGET_FOLDER}/builds/current (ln -sfn)
+  - Symlink htdocs to {TARGET_FOLDER}/builds/current (ln -sfn)
 
   - Drop DB
 
-  - Run restore
+  - Restore backup DB
 
   - rm -r {TARGET_FOLDER}/builds/candidate

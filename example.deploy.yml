@@ -1,24 +1,34 @@
 ##
 # Ansible playbook for starterkit deployment.
+#
 # Requires the following parameters called upon playbook execution:
 # HOSTNAME: the name of the host
+# USER: the ssh user to access the server
+# GROUP: The group name used by the webserver
+# PROJECT_NAME: name of the current project
+# DB_SU: The root database username
+# DB_SU_PW: The root database user password
+# DB_USER: The project database user
+# DB_PW: The project database user password
+# DB_NAME: The name of the database
+# DRUPAL_SU_PW: Drupal root user password
 # TARGET_FOLDER: /path/to/target/project/folder on the remote
 # BACKUP_FOLDER: /path/to/target/backup/folder on the remote
-# PROJECT_NAME: name of the current project
-# JENKINS_WORKSPACE: /path/to/jenkins/workspace locally
+# LOCAL_PROJECT_FOLDER: /path/to/workspace locally
 #
 ##
 
 ---
-- hosts: ${HOSTNAME}
+- hosts: $HOSTNAME
+  user: $USER
   sudo: yes
 
-- vars:
-    base: /path/to/tasks
+  vars:
+    base: deploy/tasks
+    group: $GROUP
 
 
-- tasks:
+  tasks:
     - include: $base/deploy.yml
     - include: $base/finalize.yml
     - include: $base/rollback.yml
-

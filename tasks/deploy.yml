@@ -15,12 +15,6 @@
   tags:
     - init
 
-- name: Set permissions
-  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}
-  sudo: yes
-  tags:
-    - init
-
 - name: Create builds folder
   file: path=${TARGET_FOLDER}/builds state=directory
   tags:
@@ -51,15 +45,21 @@
   tags:
     - init
 
+- name: Set permissions
+  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}
+  sudo: yes
+  tags:
+    - init
+
 - name: Archive project
   connection: local
-  shell: cd ${JENKINS_WORKSPACE}; tar czvf candidate.tar.gz .
+  shell: cd ${LOCAL_PROJECT_FOLDER}; tar czvf candidate.tar.gz .
   tags:
     - init
     - migrate
 
 - name: Upload tarball to remote
-  action: copy src=${JENKINS_WORKSPACE}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate/candidate.tar.gz
+  action: copy src=${LOCAL_PROJECT_FOLDER}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate/candidate.tar.gz
   tags:
     - init
     - migrate
@@ -88,7 +88,7 @@
     - init
 
 - name: Update admin password
-  action: command drush --root=${TARGET_FOLDER}/htdocs upwd admin --password="${ADMIN_PASS}"
+  action: command drush --root=${TARGET_FOLDER}/htdocs upwd admin --password="${DRUPAL_SU_PW}"
   tags:
     - init
 
@@ -122,5 +122,15 @@
   action: command ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
   tags:
     - init
+    - migrate
+
+- name: Update database
+  command: drush --root=${TARGET_FOLDER}/htdocs updb -y
+  tags:
+    - migrate
+
+- name: Bring site online
+  command: drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
+  tags:
     - migrate
 
