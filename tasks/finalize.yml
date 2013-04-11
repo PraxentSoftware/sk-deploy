@@ -1,55 +1,48 @@
-##
-# Ansible playbook for starterkit deployment.
-# Requires the following parameters called upon playbook execution:
-# HOSTNAME: the name of the host
-# TARGET_FOLDER: /path/to/target/project/folder on the remote
-##
-
 ---
 - name: Remove old build
-  action: command rm -rf ${TARGET_FOLDER}/builds/old
+  command: rm -rf ${TARGET_FOLDER}/builds/old
   tags:
    - init
    - finalize
 
 - name: Move previous build to old build
-  action: command mv ${TARGET_FOLDER}/builds/previous ${TARGET_FOLDER}/builds/old
+  command: mv ${TARGET_FOLDER}/builds/previous ${TARGET_FOLDER}/builds/old
   tags:
    - init
    - finalize
 
 - name: Move current build to previous build
-  action: command mv ${TARGET_FOLDER}/builds/current ${TARGET_FOLDER}/builds/previous
+  command: mv ${TARGET_FOLDER}/builds/current ${TARGET_FOLDER}/builds/previous
   tags:
    - init
    - finalize
 
 - name: Move candidate build to current build
-  action: command mv ${TARGET_FOLDER}/builds/candidate  ${TARGET_FOLDER}/builds/current
+  command: mv ${TARGET_FOLDER}/builds/candidate  ${TARGET_FOLDER}/builds/current
   tags:
    - init
    - finalize
 
 - name: Update htdocs symlink to current build
-  action: command ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs
+  command: ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs
   tags:
    - init
    - finalize
 
 - name: Symlink drupal files folder to shared files folder
-  action: command ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/current/htdocs/sites/default/files
+  command: ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/current/htdocs/sites/default/files
   tags:
     - init
     - finalize
 
 - name: Symlink drupal settings.php to shared settings.php file
-  action: command ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/current/htdocs/sites/default/settings.php
+  command: ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/current/htdocs/sites/default/settings.php
   tags:
     - init
     - finalize
 
 
 - name: Bring site online
-  action: command drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
+  command: drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
   tags:
     - finalize

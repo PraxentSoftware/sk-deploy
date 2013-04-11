@@ -1,13 +1,3 @@
-##
-# Ansible playbook for starterkit deployment.
-# Requires the following parameters called upon playbook execution:
-# HOSTNAME: the name of the host
-# TARGET_FOLDER: /path/to/target/project/folder on the remote
-# DB_NAME: The target production database name
-# DB_USER: The target production database mysql user
-# DB_PASSWORD: The target production database mysql password
-##
-
 ---
 - name: Replace candidate build htdocs symlink with current symlink
   command: ln -sfn ${TARGET_FOLDER}/builds/current/htdocs ${TARGET_FOLDER}/htdocs
@@ -15,17 +5,22 @@
     - rollback
 
 - name: Drop current database
-  command: mysql --user=${DB_SU} --password=${DB_SU_PW} -h localhost -e "DROP DATABASE IF EXISTS ${DB_NAME};"
+  mysql_db: db=${DB_NAME} login_user=${DB_SU} login_password=${DB_SU_PW} state=absent
   tags:
     - rollback
 
 - name: Create database
-  command: mysql --user=${DB_SU} --password=${DB_SU_PW} -h localhost -e "CREATE DATABASE IF NOT EXISTS ${DB_NAME}; GRANT ALL ON ${DB_NAME}.* TO ${DB_USER}@'localhost' IDENTIFIED BY '${DB_PW}';"
+  mysql_db: db=${DB_NAME} login_user=${DB_SU} login_password=${DB_SU_PW} state=present
   tags:
      - rollback
 
+- name: Create database user
+  mysql_user: name=${DB_USER} password=${DB_PW} priv=${DB_NAME}.*:ALL  login_user=${DB_SU} login_password=${DB_SU_PW} state=present
+  tags:
+    - rollback
+
 - name: Restore backup DB
-  command: drush sqlc --root=${TARGET_FOLDER}/htdocs < ${BACKUP_FOLDER}/current.sql -y
+  mysql_db: db=${DB_NAME} target=${BACKUP_FOLDER}/current.sql login_user=${DB_SU} login_password=${DB_SU_PW} state=import
   tags:
     - rollback
 

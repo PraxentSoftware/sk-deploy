@@ -1,0 +1,61 @@
+---
+- name: Create candidate folder
+  file: path=${TARGET_FOLDER}/builds/candidate state=directory
+  tags:
+    - migrate
+
+- name: Archive project
+  connection: local
+  shell: cd ${LOCAL_PROJECT_FOLDER}; tar czvf candidate.tar.gz .
+  tags:
+    - migrate
+
+- name: Upload tarball to remote
+  action: copy src=${LOCAL_PROJECT_FOLDER}/candidate.tar.gz dest=${TARGET_FOLDER}/builds/candidate/candidate.tar.gz
+  tags:
+    - migrate
+
+- name: Unpack project tarball to candidate
+  shell: tar zxf ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
+  tags:
+    - migrate
+
+- name: Remove candidate build tarball
+  command: rm -f ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz
+  tags:
+    - migrate
+
+- name: Symlink drupal files folder to shared files folder
+  command: ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/files
+  tags:
+    - migrate
+
+- name: Put site in offline mode
+  command: drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 1
+  tags:
+    - migrate
+
+- name: Backup current site
+  mysql_db: db=${DB_NAME} target=${BACKUP_FOLDER}/current.sql login_user=${DB_SU} login_password=${DB_SU_PW} state=dump
+  tags:
+    - migrate
+
+- name: Symlink drupal settings.php to shared settings.php file
+  command: ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
+  tags:
+    - migrate
+
+- name: Set htdocs symlink to candidate
+  command: ln -sfn ${TARGET_FOLDER}/builds/candidate/htdocs ${TARGET_FOLDER}/htdocs
+  tags:
+   - migrate
+
+- name: Update database
+  command: drush --root=${TARGET_FOLDER}/htdocs updb -y
+  tags:
+    - migrate
+
+- name: Bring site online
+  command: drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
+  tags:
+    - migrate

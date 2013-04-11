@@ -29,6 +29,7 @@
 
 
   tasks:
-    - include: $base/deploy.yml
+    - include: $base/init.yml
+    - include: $base/migrate.yml
     - include: $base/finalize.yml
     - include: $base/rollback.yml
