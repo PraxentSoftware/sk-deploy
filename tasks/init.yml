@@ -36,7 +36,7 @@
 
 - name: Archive project
   connection: local
-  shell: cd ${LOCAL_PROJECT_FOLDER}; tar czvf candidate.tar.gz .
+  shell: cd ${LOCAL_PROJECT_FOLDER}; tar czf candidate.tar.gz .
   sudo: no
   tags:
     - init
