@@ -19,6 +19,11 @@
   tags:
     - rollback
 
+- name: Unzip backup
+  command: tar xzf ${BACKUP_FOLDER}/current.tar.gz -C ${BACKUP_FOLDER}/
+  tags:
+    - rollback
+
 - name: Restore backup DB
   mysql_db: db=${DB_NAME} target=${BACKUP_FOLDER}/current.sql login_user=${DB_SU} login_password=${DB_SU_PW} state=import
   tags:
@@ -26,6 +31,11 @@
 
 - name: Remove candidate build
   command: rm -rf ${TARGET_FOLDER}/builds/candidate
+  tags:
+    - rollback
+
+- name: Remove raw SQL
+  command: rm  ${BACKUP_FOLDER}/current.sql
   tags:
     - rollback
 

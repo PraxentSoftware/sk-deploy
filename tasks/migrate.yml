@@ -40,6 +40,16 @@
   tags:
     - migrate
 
+- name: Compress backup
+  command: tar -czC ${BACKUP_FOLDER} -f ${BACKUP_FOLDER}/current.tar.gz current.sql
+  tags:
+    - migrate
+
+- name: Remove raw SQL
+  command: rm  ${BACKUP_FOLDER}/current.sql
+  tags:
+    - migrate
+
 - name: Symlink drupal settings.php to shared settings.php file
   command: ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
   tags:
