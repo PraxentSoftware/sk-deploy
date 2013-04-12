@@ -36,7 +36,7 @@
 
 - name: Archive project
   connection: local
-  shell: cd ${LOCAL_PROJECT_FOLDER}; tar czf candidate.tar.gz .
+  shell: cd ${LOCAL_PROJECT_FOLDER}/${PROJECT_NAME}; tar czf ${LOCAL_PROJECT_FOLDER}/candidate.tar.gz .
   sudo: no
   tags:
     - init
@@ -63,6 +63,16 @@
 
 - name: Install profile
   command: drush --root=${TARGET_FOLDER}/htdocs si ${PROJECT_NAME} --db-su=${DB_SU} --db-su-pw=${DB_SU_PW} --db-url=mysql://${DB_USER}:${DB_PW}@localhost/${DB_NAME} -y
+  tags:
+    - init
+
+- name: Move settings to shared
+  command: mv ${TARGET_FOLDER}/htdocs/sites/default/settings.php ${TARGET_FOLDER}/shared/settings.php
+  tags:
+    - init
+
+- name: Move files to shared
+  command: mv ${TARGET_FOLDER}/htdocs/sites/default/files ${TARGET_FOLDER}/shared/files
   tags:
     - init
 
