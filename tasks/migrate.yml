@@ -7,6 +7,7 @@
 - name: Archive project
   connection: local
   shell: cd ${LOCAL_PROJECT_FOLDER}; tar czvf candidate.tar.gz .
+  sudo: no
   tags:
     - migrate
 
