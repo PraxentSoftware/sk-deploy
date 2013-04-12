@@ -56,16 +56,6 @@
   tags:
     - init
 
-- name: Symlink drupal files folder to shared files folder
-  command: ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/files
-  tags:
-    - init
-
-- name: Symlink drupal settings.php to shared settings.php file
-  command: ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
-  tags:
-    - init
-
 - name: Set htdocs symlink to candidate
   command: ln -sfn ${TARGET_FOLDER}/builds/candidate/htdocs ${TARGET_FOLDER}/htdocs
   tags:
@@ -73,6 +63,16 @@
 
 - name: Install profile
   command: drush --root=${TARGET_FOLDER}/htdocs si ${PROJECT_NAME} --db-su=${DB_SU} --db-su-pw=${DB_SU_PW} --db-url=mysql://${DB_USER}:${DB_PW}@localhost/${DB_NAME} -y
+  tags:
+    - init
+
+- name: Symlink drupal files folder to shared files folder
+  command: ln -sfn ${TARGET_FOLDER}/shared/files ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/files
+  tags:
+    - init
+
+- name: Symlink drupal settings.php to shared settings.php file
+  command: ln -sfn ${TARGET_FOLDER}/shared/settings.php ${TARGET_FOLDER}/builds/candidate/htdocs/sites/default/settings.php
   tags:
     - init
 
