@@ -34,12 +34,6 @@
   tags:
     - init
 
-- name: Set permissions
-  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}
-  sudo: yes
-  tags:
-    - init
-
 - name: Archive project
   connection: local
   shell: cd ${LOCAL_PROJECT_FOLDER}; tar czvf candidate.tar.gz .
@@ -52,7 +46,7 @@
     - init
 
 - name: Unpack project tarball to candidate
-  shell: tar zxf ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
+  shell: tar zxfo ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
   tags:
     - init
 

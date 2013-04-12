@@ -16,7 +16,7 @@
     - migrate
 
 - name: Unpack project tarball to candidate
-  shell: tar zxf ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
+  shell: tar zxfo ${TARGET_FOLDER}/builds/candidate/candidate.tar.gz -C ${TARGET_FOLDER}/builds/candidate
   tags:
     - migrate
 
@@ -59,6 +59,12 @@
   command: ln -sfn ${TARGET_FOLDER}/builds/candidate/htdocs ${TARGET_FOLDER}/htdocs
   tags:
    - migrate
+
+- name: Set permissions
+  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}/htdocs/
+  sudo: yes
+  tags:
+    - migrate
 
 - name: Update database
   command: drush --root=${TARGET_FOLDER}/htdocs updb -y

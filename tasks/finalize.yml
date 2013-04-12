@@ -41,6 +41,12 @@
     - init
     - finalize
 
+- name: Set permissions
+  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}/htdocs/
+  sudo: yes
+  tags:
+    - init
+    - finalize
 
 - name: Bring site online
   command: drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
