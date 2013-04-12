@@ -37,7 +37,7 @@
     - migrate
 
 - name: Backup current site
-  mysql_db: db=${DB_NAME} target=${BACKUP_FOLDER}/current.sql login_user=${DB_SU} login_password=${DB_SU_PW} state=dump
+  shell: mysqldump -u${DB_SU} -p{DB_SU_PW} ${DB_NAME} > ${BACKUP_FOLDER}/current.sql
   tags:
     - migrate
 
