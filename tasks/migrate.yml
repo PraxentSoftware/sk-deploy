@@ -62,7 +62,7 @@
    - migrate
 
 - name: Set permissions
-  shell: chown -R ${USER}:${GROUP} ${TARGET_FOLDER}/htdocs/
+  shell: chown -R ${WEB_USER}:${GROUP} ${TARGET_FOLDER}/htdocs/
   sudo: yes
   tags:
     - migrate

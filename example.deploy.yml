@@ -3,7 +3,8 @@
 #
 # Requires the following parameters called upon playbook execution:
 # HOSTNAME: the name of the host
-# USER: the ssh user to access the server
+# SERVER_USER: the ssh user to access the server
+# WEB_USER: The owning user of the docroot
 # GROUP: The group name used by the webserver
 # PROJECT_NAME: name of the current project
 # DB_SU: The root database username
@@ -20,7 +21,7 @@
 
 ---
 - hosts: $HOSTNAME
-  user: $USER
+  user: $SERVER_USER
   sudo: yes
 
   vars:
