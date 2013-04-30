@@ -26,6 +26,8 @@ When the deploy playbook is called, you must pass in:
 
 - the database name
 
+- the Drupal adminstrative user
+
 - the Drupal root user password
 
 - the target folder

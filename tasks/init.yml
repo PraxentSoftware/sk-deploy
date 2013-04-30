@@ -87,6 +87,6 @@
     - init
 
 - name: Update admin password
-  command: drush --root=${TARGET_FOLDER}/htdocs upwd admin --password=${DRUPAL_SU_PW}
+  command: drush --root=${TARGET_FOLDER}/htdocs upwd ${DRUPAL_SU} --password=${DRUPAL_SU_PW}
   tags:
     - init

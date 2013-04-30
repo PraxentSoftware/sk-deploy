@@ -12,6 +12,7 @@
 # DB_USER: The project database user
 # DB_PW: The project database user password
 # DB_NAME: The name of the database
+# DRUPAL_SU: Drupal administrative user
 # DRUPAL_SU_PW: Drupal root user password
 # TARGET_FOLDER: /path/to/target/project/folder on the remote
 # BACKUP_FOLDER: /path/to/target/backup/folder on the remote
@@ -27,7 +28,6 @@
   vars:
     base: deploy/tasks
     group: $GROUP
-
 
   tasks:
     - include: $base/init.yml
