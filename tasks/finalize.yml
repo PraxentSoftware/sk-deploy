@@ -48,6 +48,9 @@
     - init
     - finalize
 
+- name: Restart Apache
+  command: apachectl gracefull
+
 - name: Bring site online
   command: drush --root=${TARGET_FOLDER}/htdocs vset maintenance_mode 0
   tags:
